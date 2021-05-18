@@ -25,16 +25,20 @@ tempTitle.setStyleSheet("font-size: 45px;"
 window.show()
 
 #make button 
-button = QPushButton("ENTER")
+enterButton = QPushButton("ENTER")
 #indicate it is clickable
-button.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
-button.setStyleSheet(
-    "border: 5px solid 'orange';"
+enterButton.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+enterButton.setStyleSheet(
+    "*{border: 5px solid 'white';"
     + "font-size: 60px;"
-    + "color: 'white'"
+    + "margin: 50px 100px;"
+    + "padding: 25px 0;"
+    + "border-radius: 15px;}"
+    + "*:hover{background: 'white';}"
 )
+
 #place Widgets on grid (Item, Row, Column)
-grid.addWidget(button, 1, 0)
+grid.addWidget(enterButton, 1, 0)
 
 #apply grind to window
 window.setLayout(grid)

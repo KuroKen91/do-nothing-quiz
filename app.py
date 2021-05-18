@@ -7,17 +7,23 @@ from PyQt5.QtGui import QCursor
 app = QApplication(sys.argv)
 window = QWidget()
 window.setWindowTitle("Do Nothing Quiz")
-window.setFixedWidth(750)
-window.setStyleSheet("background: #161219;")
+window.setFixedWidth(500)
+window.setFixedHeight(500)
+window.move(500, 200) #determines where window opens (x,y)
+window.setStyleSheet("background: purple;")
+
 
 grid = QGridLayout()
 
 
+#apply grind to window
 window.setLayout(grid)
 
 window.show()
 sys.exit(app.exec())
-#display Logo
+
+
+#display Logo. Move up once I have a logo
 #image = QPixmap("LOGO THING GOES HERE")
 #logo = QLabel() 
 #logo.setPixmap(image)

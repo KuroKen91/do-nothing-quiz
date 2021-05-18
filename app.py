@@ -8,20 +8,20 @@ from PyQt5.QtGui import QCursor
 
 #get data from seperate file
 file = open('data.json')
-data = json.load(file)
+file_data = json.load(file)
 
 #load the data from custom json file. Can try backend here!
 def load_data():
-     question = (data["question"])
-     options = (data["options"])
-     answers = (data['answer'][0])
+     question = (file_data["question"])
+     options = (file_data["options"])
+     answers = (file_data['answer'])
 
-     parameters['question'].append(question[0])
-     parameters["answer"].append(answers)
-     parameters["option1"].append(options[0])
-     parameters["option2"].append(options[1])
+     data['question'].append(question[0])
+     data["answer"].append(answers[0])
+     data["option1"].append(options[0])
+     data["option2"].append(options[1])
 
-parameters = {
+data = {
     "question": [],
     "option1": [],
     "option2": [],
@@ -50,6 +50,9 @@ window.setStyleSheet("background: purple;")
 
 
 grid = QGridLayout()
+
+#current question number for answer. FINE WAY TO RESET AFTER RESTART
+q_number = 0
 
 #remove widgets off GUI
 def remove_widgets():
@@ -83,10 +86,18 @@ def make_buttons(answer):
     button.clicked.connect(lambda n: is_correct(answer))
     return button
 
+#checking if answer is correct
 def is_correct(answer):
-    print(answer)
+    if answer == data["answer"][0]:
+        print(answer + " is correct!")
+    else:
+        remove_widgets()
+        lose_page()
+
+
 #start at title screen
 def titleScreen():
+    print(data["answer"][0])
     #make temporary logo/intro title
     # tempTitle = QtWidgets.QLabel(window)
     # tempTitle.setText('Do Nothing Quiz!')
@@ -119,9 +130,9 @@ def titleScreen():
 #titleScreen() #call the title screen
 #Begin testing screen
 def begin_test():
-    # print(parameters(['options'])) #can't be called?
-    # print(parameters(['options'][0]))
-    # print(parameters['question'][0])#not preloading
+    # print(data(['options'])) #can't be called?
+    # print(data(['options'][0]))
+    # print(data['question'][0])#not preloading
     score = QLabel("Score: 80") #set later
     score.setAlignment(QtCore.Qt.AlignRight)
     score.setStyleSheet(
@@ -133,7 +144,7 @@ def begin_test():
     )
     widgets["score"].append(score)
 
-    question = QLabel(parameters['question'][0])
+    question = QLabel(data['question'][0])
     question.setAlignment(QtCore.Qt.AlignCenter)
     question.setWordWrap(True)
     question.setStyleSheet(
@@ -143,8 +154,8 @@ def begin_test():
     )
     widgets["question"].append(question)
 
-    button1 = make_buttons(parameters['option1'][0])
-    button2 = make_buttons(parameters['option2'][0])
+    button1 = make_buttons(data['option1'][0])
+    button2 = make_buttons(data['option2'][0])
 
     widgets["option1"].append(button1)
     widgets["option2"].append(button2)
@@ -186,7 +197,7 @@ def win_page():
 
 
 def lose_page():
-    lose_message = QLabel("Your final score was:")
+    lose_message = QLabel("Get bent...")
     lose_message.setAlignment(QtCore.Qt.AlignCenter)
     lose_message.setStyleSheet(
         "font-size: 35px;"

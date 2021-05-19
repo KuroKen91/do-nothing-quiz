@@ -62,13 +62,20 @@ def remove_widgets():
         for i in range(0, len(widgets[widget])):
             widgets[widget].pop()
 
+#reset the parameters
+
+
 def return_to_title():
     remove_widgets()
+    data["score"] = [0]
+    data["q_number"] = 0
+    data["question"]
     titleScreen()
 
 def start_game():
     remove_widgets()
-    begin_test()
+    load_data()
+    titleScreen()
 
 #make the buttons 
 def make_buttons(answer):
@@ -88,19 +95,25 @@ def make_buttons(answer):
 
 #checking if answer is correct
 def is_correct(answer):
+    temp_score = data["score"][-1]
     if answer == data["answer"][0][data["q_number"]]:
-        print(answer + " is correct!")
-        print(data["q_number"])
-        data["q_number"] += 1
-        print(data["q_number"])
         #replace score with new one
-        temp_score = data["score"][-1]
         data["score"].pop()
         data["score"].append(temp_score + 10)
-        print(data["question"])
+        if temp_score == 30:
+            remove_widgets()
+            win_page()
+        else :
+            print(data["question"])
+            print(answer + " is correct!")
+            print(data["q_number"])
+            data["q_number"] += 1
+            print(data["q_number"])
 
-        widgets["score"][-1].setText(str(data["score"][-1]))
-        widgets["question"][0].setText(data["question"][0][data["q_number"]])
+   
+            widgets["score"][-1].setText(str(data["score"][-1]))
+            widgets["question"][0].setText(data["question"][0][data["q_number"]])
+
 
     else:
         remove_widgets()
@@ -133,7 +146,7 @@ def titleScreen():
         + "border-radius: 15px;}"
         + "*:hover{background: 'white';}"
     )
-    enter_button.clicked.connect(start_game)
+    enter_button.clicked.connect(begin_test)
     widgets["button"].append(enter_button) #global variable now accessible in function block. appends object to list
 
     #place Widgets on grid (Item, Row, Column)
@@ -180,14 +193,14 @@ def begin_test():
 
 # WIN RESULT PAGE - LINK TO POEM perhaps?
 def win_page():
-    win_message = QLabel("Your final score was:")
+    win_message = QLabel("Congrats!")
     win_message.setAlignment(QtCore.Qt.AlignCenter)
     win_message.setStyleSheet(
         "font-size: 35px;"
         "color: 'white';"
     )
 
-    final_score = QLabel("10")
+    final_score = QLabel(str(data["score"][-1]))
     final_score.setStyleSheet(
         "font-size: 35px;"
         "color: 'white';"
@@ -203,10 +216,15 @@ def win_page():
         + "*:hover{background: 'white';}"
     )
     restart_button.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+    restart_button.clicked.connect(return_to_title)
 
     widgets["message"].append(win_message)
     widgets["score"].append(final_score)
     widgets["button"].append(restart_button)
+
+    grid.addWidget(widgets["message"][-1], 0, 1)
+    grid.addWidget(widgets["button"][-1], 2, 0, 1, 2)
+    grid.addWidget(widgets["score"][-1], 1, 0)
 
 
 def lose_page():
@@ -218,7 +236,7 @@ def lose_page():
         "color: 'white';"
     )
 
-    final_score = QLabel("At least you got...10pts")
+    final_score = QLabel(str(data["score"][-1]))
     final_score.setStyleSheet(
         "font-size: 35px;"
         "color: 'white';"

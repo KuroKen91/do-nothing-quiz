@@ -3,13 +3,15 @@
       "The sky is blue?",
       "My name is",
       "My IP address is",
-      "Can you click on true?"
+      "Can you click on true?",
+      "THIS IS BAIT"
     ],
     "answer": [
       "True",
       "False",
       "False",
-      "False"
+      "False",
+      "True"
     ],
     "options": [
       "True",

@@ -16,7 +16,7 @@ def load_data():
      options = (file_data["options"])
      answers = (file_data['answer'])
 
-     data['question'].append(question[0])
+     data['question'].append(question)
      data["answer"].append(answers)
      data["option1"].append(options[0])
      data["option2"].append(options[1])
@@ -29,8 +29,7 @@ data = {
     "score": [0],
     "q_number": 0,
 }
-#load data before game begins?
-load_data()
+
 
 widgets = {
     "temp": [],
@@ -53,6 +52,7 @@ window.setStyleSheet("background: purple;")
 
 grid = QGridLayout()
 
+load_data()
 
 #remove widgets off GUI
 def remove_widgets():
@@ -93,6 +93,14 @@ def is_correct(answer):
         print(data["q_number"])
         data["q_number"] += 1
         print(data["q_number"])
+        #replace score with new one
+        temp_score = data["score"][-1]
+        data["score"].pop()
+        data["score"].append(temp_score + 10)
+        print(data["question"])
+
+        widgets["score"][-1].setText(str(data["score"][-1]))
+        widgets["question"][0].setText(data["question"][0][data["q_number"]])
 
     else:
         remove_widgets()
@@ -101,7 +109,8 @@ def is_correct(answer):
 
 #start at title screen
 def titleScreen():
-    print(data["answer"][0])
+    print(data["answer"])
+    print(data["question"][0])
     #make temporary logo/intro title
     # tempTitle = QtWidgets.QLabel(window)
     # tempTitle.setText('Do Nothing Quiz!')
@@ -148,7 +157,7 @@ def begin_test():
     )
     widgets["score"].append(score)
 
-    question = QLabel(data['question'][0])
+    question = QLabel(data['question'][0][data["q_number"]])
     question.setAlignment(QtCore.Qt.AlignCenter)
     question.setWordWrap(True)
     question.setStyleSheet(
@@ -201,6 +210,7 @@ def win_page():
 
 
 def lose_page():
+    data["q_number"] += 1
     lose_message = QLabel("Get bent...")
     lose_message.setAlignment(QtCore.Qt.AlignCenter)
     lose_message.setStyleSheet(
@@ -208,7 +218,7 @@ def lose_page():
         "color: 'white';"
     )
 
-    final_score = QLabel("Least you got...10pts")
+    final_score = QLabel("At least you got...10pts")
     final_score.setStyleSheet(
         "font-size: 35px;"
         "color: 'white';"

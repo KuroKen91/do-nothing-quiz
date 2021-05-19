@@ -17,7 +17,7 @@ def load_data():
      answers = (file_data['answer'])
 
      data['question'].append(question[0])
-     data["answer"].append(answers[0])
+     data["answer"].append(answers)
      data["option1"].append(options[0])
      data["option2"].append(options[1])
 
@@ -25,7 +25,9 @@ data = {
     "question": [],
     "option1": [],
     "option2": [],
-    "answer": []
+    "answer": [],
+    "score": [0],
+    "q_number": 0,
 }
 #load data before game begins?
 load_data()
@@ -51,8 +53,6 @@ window.setStyleSheet("background: purple;")
 
 grid = QGridLayout()
 
-#current question number for answer. FINE WAY TO RESET AFTER RESTART
-q_number = 0
 
 #remove widgets off GUI
 def remove_widgets():
@@ -88,8 +88,12 @@ def make_buttons(answer):
 
 #checking if answer is correct
 def is_correct(answer):
-    if answer == data["answer"][0]:
+    if answer == data["answer"][0][data["q_number"]]:
         print(answer + " is correct!")
+        print(data["q_number"])
+        data["q_number"] += 1
+        print(data["q_number"])
+
     else:
         remove_widgets()
         lose_page()
@@ -133,7 +137,7 @@ def begin_test():
     # print(data(['options'])) #can't be called?
     # print(data(['options'][0]))
     # print(data['question'][0])#not preloading
-    score = QLabel("Score: 80") #set later
+    score = QLabel(str(data["score"][-1])) #set later
     score.setAlignment(QtCore.Qt.AlignRight)
     score.setStyleSheet(
         "font-size: 35px;"
@@ -204,7 +208,7 @@ def lose_page():
         "color: 'white';"
     )
 
-    final_score = QLabel("10")
+    final_score = QLabel("Least you got...10pts")
     final_score.setStyleSheet(
         "font-size: 35px;"
         "color: 'white';"
@@ -220,10 +224,15 @@ def lose_page():
         + "*:hover{background: 'white';}"
     )
     restart_button.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+    restart_button.clicked.connect(return_to_title)
 
     widgets["message"].append(lose_message)
     widgets["score"].append(final_score)
     widgets["button"].append(restart_button)
+    
+    grid.addWidget(widgets["message"][-1], 0, 1)
+    grid.addWidget(widgets["button"][-1], 2, 0, 1, 2)
+    grid.addWidget(widgets["score"][-1], 1, 0)
 
 
 #beginTest()

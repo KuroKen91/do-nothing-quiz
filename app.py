@@ -1,6 +1,7 @@
 import sys
 import json
-import random
+import socket
+import getpass
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtWidgets import QApplication, QLabel, QPushButton, QVBoxLayout, QWidget, QFileDialog, QGridLayout
 from PyQt5.QtGui import QPixmap
@@ -9,6 +10,19 @@ from PyQt5.QtGui import QCursor
 #get data from seperate file
 file = open('data.json')
 file_data = json.load(file)
+
+#get IP address of user. If you do not want to reveal this, comment out lines 14 - 23 and uncomment line 24
+def get_ip():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        sock.connect(('10.255.255.255', 1))
+        IP = sock.getsockname()[0]
+    except Exception:
+        IP = '127.0.0.1'
+    finally:
+        sock.close()
+    return IP
+    # return IP = '1.1.1.1'
 
 #load the data from custom json file. Can try backend here!
 def load_data():
@@ -20,6 +34,7 @@ def load_data():
      data["answer"].append(answers)
      data["option1"].append(options[0])
      data["option2"].append(options[1])
+     data["IP"] = get_ip()
 
 data = {
     "question": [],
@@ -28,6 +43,7 @@ data = {
     "answer": [],
     "score": [0],
     "q_number": 0,
+    "IP": ''
 }
 
 
@@ -110,10 +126,13 @@ def is_correct(answer):
             data["q_number"] += 1
             print(data["q_number"])
 
-   
-            widgets["score"][-1].setText(str(data["score"][-1]))
-            widgets["question"][0].setText(data["question"][0][data["q_number"]])
+            if data["q_number"] == 2: 
+                widgets["score"][-1].setText(str(data["score"][-1]))
+                widgets["question"][0].setText(str(data["question"][0][data["q_number"]] +  "-" + data["IP"]))
 
+            else:
+                widgets["score"][-1].setText(str(data["score"][-1]))
+                widgets["question"][0].setText(data["question"][0][data["q_number"]])
 
     else:
         remove_widgets()
@@ -122,6 +141,7 @@ def is_correct(answer):
 
 #start at title screen
 def titleScreen():
+    print(data["IP"])
     print(data["answer"])
     print(data["question"][0])
     #make temporary logo/intro title
@@ -131,7 +151,7 @@ def titleScreen():
     # tempTitle.setStyleSheet("font-size: 45px;"
     #     + "color: 'white'"
     # )
-    # #widgets["temp"].append(tempTitle) #replace with logo later
+    #widgets["temp"].append(tempTitle) #replace with logo later
     # window.show()
 
     #make button 
@@ -151,14 +171,11 @@ def titleScreen():
 
     #place Widgets on grid (Item, Row, Column)
     grid.addWidget(widgets["button"][-1], 1, 0, 1, 2)
-    #grid.addWidget(widgets["temp"][-1], 1, 0, 1, 2)
+    # grid.addWidget(widgets["temp"][-1], 1, 0, 1, 2)
 
-#titleScreen() #call the title screen
+
 #Begin testing screen
 def begin_test():
-    # print(data(['options'])) #can't be called?
-    # print(data(['options'][0]))
-    # print(data['question'][0])#not preloading
     score = QLabel(str(data["score"][-1])) #set later
     score.setAlignment(QtCore.Qt.AlignRight)
     score.setStyleSheet(
@@ -169,8 +186,11 @@ def begin_test():
         "padding: 50px 25px;"
     )
     widgets["score"].append(score)
-
+   
+    
     question = QLabel(data['question'][0][data["q_number"]])
+    question = QLabel(data['question'][0][data["q_number"]])
+
     question.setAlignment(QtCore.Qt.AlignCenter)
     question.setWordWrap(True)
     question.setStyleSheet(
@@ -193,7 +213,7 @@ def begin_test():
 
 # WIN RESULT PAGE - LINK TO POEM perhaps?
 def win_page():
-    win_message = QLabel("Congrats!")
+    win_message = QLabel("Congrats!\n Your Final Score Was:")
     win_message.setAlignment(QtCore.Qt.AlignCenter)
     win_message.setStyleSheet(
         "font-size: 35px;"
@@ -223,8 +243,8 @@ def win_page():
     widgets["button"].append(restart_button)
 
     grid.addWidget(widgets["message"][-1], 0, 1)
+    grid.addWidget(widgets["score"][-1], 1, 2)
     grid.addWidget(widgets["button"][-1], 2, 0, 1, 2)
-    grid.addWidget(widgets["score"][-1], 1, 0)
 
 
 def lose_page():
@@ -264,7 +284,9 @@ def lose_page():
 
 
 #beginTest()
+get_ip()
 titleScreen()
+# win_page()
 
 #apply grind to window
 window.setLayout(grid)

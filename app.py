@@ -1,29 +1,39 @@
+import os
 import sys
 import json
 import socket
 import getpass
-from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtWidgets import QApplication, QLabel, QPushButton, QVBoxLayout, QWidget, QFileDialog, QGridLayout
-from PyQt5.QtGui import QPixmap
+import pyautogui
+from threading import Timer
+from PyQt5 import QtCore
+from PyQt5.QtWidgets import QApplication, QLabel, QPushButton, QWidget, QGridLayout
+from PyQt5.QtGui import QPixmap #for logo if needed
 from PyQt5.QtGui import QCursor
+
 
 #get data from seperate file
 file = open('data.json')
 file_data = json.load(file)
 
-#get IP address of user. If you do not want to reveal this, comment out lines 14 - 23 and uncomment line 24
-def get_ip():
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        sock.connect(('10.255.255.255', 1))
-        IP = sock.getsockname()[0]
-    except Exception:
-        IP = '127.0.0.1'
-    finally:
-        sock.close()
-    return IP
-    # return IP = '1.1.1.1'
+#define screen size for mouse 
+def mouse_control():
+    pyautogui.moveTo(950, 650, 3, pyautogui.easeInQuad)
 
+#get IP address of user. If you do not want to reveal this, comment out lines 24 - 32 and uncomment line 34 & 35. To reveal paste sock.connect(('10.255.255.255', 1)) in line 26
+def get_ip():
+#     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#     try:
+#    
+#         IP = sock.getsockname()[0]
+#     except Exception:
+#         IP = '127.0.0.1'
+#     finally:
+#         sock.close()
+#     return IP
+     IP = '1.1.1.1'
+     return IP
+
+#get username using environment variable. COMMENT OUT line 41 if you do not want to reveal it 
 #load the data from custom json file. Can try backend here!
 def load_data():
      question = (file_data["question"])
@@ -35,6 +45,7 @@ def load_data():
      data["option1"].append(options[0])
      data["option2"].append(options[1])
      data["IP"] = get_ip()
+     data["name"] = getpass.getuser()
 
 data = {
     "question": [],
@@ -43,7 +54,8 @@ data = {
     "answer": [],
     "score": [0],
     "q_number": 0,
-    "IP": ''
+    "IP": '',
+    "name": ''
 }
 
 
@@ -126,9 +138,19 @@ def is_correct(answer):
             data["q_number"] += 1
             print(data["q_number"])
 
-            if data["q_number"] == 2: 
+            if data["q_number"] == 1: 
                 widgets["score"][-1].setText(str(data["score"][-1]))
-                widgets["question"][0].setText(str(data["question"][0][data["q_number"]] +  "-" + data["IP"]))
+                widgets["question"][0].setText(str(data["question"][0][data["q_number"]] +  "-" + data["name"]))
+
+            elif data["q_number"] == 2: 
+                widgets["score"][-1].setText(str(data["score"][-1]))
+                widgets["question"][0].setText(str(data["question"][0][data["q_number"]] +  "-" + data["IP"]))  
+
+            elif data["q_number"] == 3: 
+                widgets["score"][-1].setText(str(data["score"][-1]))
+                widgets["question"][0].setText(str(data["question"][0][data["q_number"]]))
+                mouse_move = Timer(2.0, mouse_control)
+                mouse_move.start()
 
             else:
                 widgets["score"][-1].setText(str(data["score"][-1]))
@@ -141,6 +163,8 @@ def is_correct(answer):
 
 #start at title screen
 def titleScreen():
+    print(pyautogui.size())
+    print(os.getlogin())
     print(data["IP"])
     print(data["answer"])
     print(data["question"][0])
@@ -210,6 +234,7 @@ def begin_test():
     grid.addWidget(widgets["question"][-1], 1, 0, 1, 2) #row and column span
     grid.addWidget(widgets["option1"][-1], 2, 0)
     grid.addWidget(widgets["option2"][-1], 2, 1)
+
 
 # WIN RESULT PAGE - LINK TO POEM perhaps?
 def win_page():

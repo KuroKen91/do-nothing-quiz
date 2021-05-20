@@ -37,7 +37,7 @@ Next, activate the virtual environment:
 ** FOR WINDOWS USERS **
 
 ```
-source /.venv/bin/activate
+source .venv/bin/activate
 ```
 
 Activate the project app by clicking on the green arrow (vscode) or by typing the following in the terminal:

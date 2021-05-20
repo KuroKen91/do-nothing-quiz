@@ -19,11 +19,11 @@ file_data = json.load(file)
 def mouse_control():
     pyautogui.moveTo(950, 650, 3, pyautogui.easeInQuad)
 
-#get IP address of user. If you do not want to reveal this, comment out lines 24 - 32 and uncomment line 34 & 35. To reveal paste sock.connect(('10.255.255.255', 1)) in line 26
+#get IP address of user. If you do not want to reveal this, comment out lines 24 - 32 and uncomment line 34 & 35. To reveal paste sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) in line 24
 def get_ip():
-#     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#     
 #     try:
-#    
+#         sock.connect(('10.255.255.255', 1))
 #         IP = sock.getsockname()[0]
 #     except Exception:
 #         IP = '127.0.0.1'

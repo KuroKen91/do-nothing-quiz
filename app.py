@@ -1,25 +1,51 @@
+import os
 import sys
 import json
-import random
-from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtWidgets import QApplication, QLabel, QPushButton, QVBoxLayout, QWidget, QFileDialog, QGridLayout
-from PyQt5.QtGui import QPixmap
+import socket
+import getpass
+import pyautogui
+from threading import Timer
+from PyQt5 import QtCore
+from PyQt5.QtWidgets import QApplication, QLabel, QPushButton, QWidget, QGridLayout
+from PyQt5.QtGui import QPixmap #for logo if needed
 from PyQt5.QtGui import QCursor
+
 
 #get data from seperate file
 file = open('data.json')
 file_data = json.load(file)
 
+#define screen size for mouse 
+def mouse_control():
+    pyautogui.moveTo(950, 650, 3, pyautogui.easeInQuad)
+
+#get IP address of user. If you do not want to reveal this, comment out lines 24 - 32 and uncomment line 34 & 35. To reveal paste sock.connect(('10.255.255.255', 1)) in line 26
+def get_ip():
+#     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#     try:
+#    
+#         IP = sock.getsockname()[0]
+#     except Exception:
+#         IP = '127.0.0.1'
+#     finally:
+#         sock.close()
+#     return IP
+     IP = '1.1.1.1'
+     return IP
+
+#get username using environment variable. COMMENT OUT line 41 if you do not want to reveal it 
 #load the data from custom json file. Can try backend here!
 def load_data():
      question = (file_data["question"])
      options = (file_data["options"])
      answers = (file_data['answer'])
 
-     data['question'].append(question[0])
+     data['question'].append(question)
      data["answer"].append(answers)
      data["option1"].append(options[0])
      data["option2"].append(options[1])
+     data["IP"] = get_ip()
+     data["name"] = getpass.getuser()
 
 data = {
     "question": [],
@@ -28,9 +54,10 @@ data = {
     "answer": [],
     "score": [0],
     "q_number": 0,
+    "IP": '',
+    "name": ''
 }
-#load data before game begins?
-load_data()
+
 
 widgets = {
     "temp": [],
@@ -53,6 +80,7 @@ window.setStyleSheet("background: purple;")
 
 grid = QGridLayout()
 
+load_data()
 
 #remove widgets off GUI
 def remove_widgets():
@@ -62,13 +90,20 @@ def remove_widgets():
         for i in range(0, len(widgets[widget])):
             widgets[widget].pop()
 
+#reset the parameters
+
+
 def return_to_title():
     remove_widgets()
+    data["score"] = [0]
+    data["q_number"] = 0
+    data["question"]
     titleScreen()
 
 def start_game():
     remove_widgets()
-    begin_test()
+    load_data()
+    titleScreen()
 
 #make the buttons 
 def make_buttons(answer):
@@ -88,11 +123,38 @@ def make_buttons(answer):
 
 #checking if answer is correct
 def is_correct(answer):
+    temp_score = data["score"][-1]
     if answer == data["answer"][0][data["q_number"]]:
-        print(answer + " is correct!")
-        print(data["q_number"])
-        data["q_number"] += 1
-        print(data["q_number"])
+        #replace score with new one
+        data["score"].pop()
+        data["score"].append(temp_score + 10)
+        if temp_score == 30:
+            remove_widgets()
+            win_page()
+        else :
+            print(data["question"])
+            print(answer + " is correct!")
+            print(data["q_number"])
+            data["q_number"] += 1
+            print(data["q_number"])
+
+            if data["q_number"] == 1: 
+                widgets["score"][-1].setText(str(data["score"][-1]))
+                widgets["question"][0].setText(str(data["question"][0][data["q_number"]] +  "-" + data["name"]))
+
+            elif data["q_number"] == 2: 
+                widgets["score"][-1].setText(str(data["score"][-1]))
+                widgets["question"][0].setText(str(data["question"][0][data["q_number"]] +  "-" + data["IP"]))  
+
+            elif data["q_number"] == 3: 
+                widgets["score"][-1].setText(str(data["score"][-1]))
+                widgets["question"][0].setText(str(data["question"][0][data["q_number"]]))
+                mouse_move = Timer(2.0, mouse_control)
+                mouse_move.start()
+
+            else:
+                widgets["score"][-1].setText(str(data["score"][-1]))
+                widgets["question"][0].setText(data["question"][0][data["q_number"]])
 
     else:
         remove_widgets()
@@ -101,7 +163,11 @@ def is_correct(answer):
 
 #start at title screen
 def titleScreen():
-    print(data["answer"][0])
+    print(pyautogui.size())
+    print(os.getlogin())
+    print(data["IP"])
+    print(data["answer"])
+    print(data["question"][0])
     #make temporary logo/intro title
     # tempTitle = QtWidgets.QLabel(window)
     # tempTitle.setText('Do Nothing Quiz!')
@@ -109,7 +175,7 @@ def titleScreen():
     # tempTitle.setStyleSheet("font-size: 45px;"
     #     + "color: 'white'"
     # )
-    # #widgets["temp"].append(tempTitle) #replace with logo later
+    #widgets["temp"].append(tempTitle) #replace with logo later
     # window.show()
 
     #make button 
@@ -124,19 +190,16 @@ def titleScreen():
         + "border-radius: 15px;}"
         + "*:hover{background: 'white';}"
     )
-    enter_button.clicked.connect(start_game)
+    enter_button.clicked.connect(begin_test)
     widgets["button"].append(enter_button) #global variable now accessible in function block. appends object to list
 
     #place Widgets on grid (Item, Row, Column)
     grid.addWidget(widgets["button"][-1], 1, 0, 1, 2)
-    #grid.addWidget(widgets["temp"][-1], 1, 0, 1, 2)
+    # grid.addWidget(widgets["temp"][-1], 1, 0, 1, 2)
 
-#titleScreen() #call the title screen
+
 #Begin testing screen
 def begin_test():
-    # print(data(['options'])) #can't be called?
-    # print(data(['options'][0]))
-    # print(data['question'][0])#not preloading
     score = QLabel(str(data["score"][-1])) #set later
     score.setAlignment(QtCore.Qt.AlignRight)
     score.setStyleSheet(
@@ -147,8 +210,11 @@ def begin_test():
         "padding: 50px 25px;"
     )
     widgets["score"].append(score)
+   
+    
+    question = QLabel(data['question'][0][data["q_number"]])
+    question = QLabel(data['question'][0][data["q_number"]])
 
-    question = QLabel(data['question'][0])
     question.setAlignment(QtCore.Qt.AlignCenter)
     question.setWordWrap(True)
     question.setStyleSheet(
@@ -169,16 +235,17 @@ def begin_test():
     grid.addWidget(widgets["option1"][-1], 2, 0)
     grid.addWidget(widgets["option2"][-1], 2, 1)
 
+
 # WIN RESULT PAGE - LINK TO POEM perhaps?
 def win_page():
-    win_message = QLabel("Your final score was:")
+    win_message = QLabel("Congrats!\n Your Final Score Was:")
     win_message.setAlignment(QtCore.Qt.AlignCenter)
     win_message.setStyleSheet(
         "font-size: 35px;"
         "color: 'white';"
     )
 
-    final_score = QLabel("10")
+    final_score = QLabel(str(data["score"][-1]))
     final_score.setStyleSheet(
         "font-size: 35px;"
         "color: 'white';"
@@ -194,13 +261,19 @@ def win_page():
         + "*:hover{background: 'white';}"
     )
     restart_button.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+    restart_button.clicked.connect(return_to_title)
 
     widgets["message"].append(win_message)
     widgets["score"].append(final_score)
     widgets["button"].append(restart_button)
 
+    grid.addWidget(widgets["message"][-1], 0, 1)
+    grid.addWidget(widgets["score"][-1], 1, 2)
+    grid.addWidget(widgets["button"][-1], 2, 0, 1, 2)
+
 
 def lose_page():
+    data["q_number"] += 1
     lose_message = QLabel("Get bent...")
     lose_message.setAlignment(QtCore.Qt.AlignCenter)
     lose_message.setStyleSheet(
@@ -208,7 +281,7 @@ def lose_page():
         "color: 'white';"
     )
 
-    final_score = QLabel("Least you got...10pts")
+    final_score = QLabel(str(data["score"][-1]))
     final_score.setStyleSheet(
         "font-size: 35px;"
         "color: 'white';"
@@ -236,7 +309,9 @@ def lose_page():
 
 
 #beginTest()
+get_ip()
 titleScreen()
+# win_page()
 
 #apply grind to window
 window.setLayout(grid)

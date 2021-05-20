@@ -1,15 +1,17 @@
 {
     "question": [
-      "The sky is blue?",
-      "My name is",
-      "My IP address is",
-      "Can you click on true?"
+      "Is the sky blue?",
+      "Your name is",
+      "Your IP address is",
+      "Can you click on True?",
+      "THIS IS BAIT"
     ],
     "answer": [
       "True",
       "False",
       "False",
-      "False"
+      "False",
+      "True"
     ],
     "options": [
       "True",
